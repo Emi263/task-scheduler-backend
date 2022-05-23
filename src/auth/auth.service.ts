@@ -5,7 +5,8 @@ import { AuthLoginDto } from './dto';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
-@Injectable({}) //anotate, use despendency injection
+
+@Injectable({}) //anotate, use dependency injection
 export class AuthService {
   constructor(
     private prismaService: PrismaService,
@@ -48,7 +49,7 @@ export class AuthService {
         },
       });
       delete user.hashedPassword;
-      return user;
+      return this.signToken(user.id,user.email)
     } catch (err) {
       if (err instanceof PrismaClientKnownRequestError) {
         if (err.code === 'P2002') {
@@ -65,7 +66,7 @@ export class AuthService {
     };
     const token = await this.jwt.signAsync(data, {
       secret: this.config.get('JWT_SECRET'),
-      expiresIn:10000,
+      expiresIn:'10h',
     });
 
     return { token };
