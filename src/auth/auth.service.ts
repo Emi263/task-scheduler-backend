@@ -38,6 +38,8 @@ export class AuthService {
   }
 
   async signUp(dto: AuthLoginDto) {
+    console.log(dto);
+
     //generate the password
     try {
       const hash = await bycrypt.hash(dto.password, 10);
@@ -46,10 +48,12 @@ export class AuthService {
         data: {
           email: dto.email,
           hashedPassword: hash,
+          name: '',
+          age: 0,
         },
       });
       delete user.hashedPassword;
-      return this.signToken(user.id,user.email)
+      return this.signToken(user.id, user.email);
     } catch (err) {
       if (err instanceof PrismaClientKnownRequestError) {
         if (err.code === 'P2002') {
@@ -66,7 +70,7 @@ export class AuthService {
     };
     const token = await this.jwt.signAsync(data, {
       secret: this.config.get('JWT_SECRET'),
-      expiresIn:'10h',
+      expiresIn: '10h',
     });
 
     return { token };

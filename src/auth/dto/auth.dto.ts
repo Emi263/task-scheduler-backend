@@ -28,15 +28,10 @@ export class AuthSignupDto {
   name: string;
 
   @IsNotEmpty()
-  @MinLength(5, { message: 'Surname is too short' })
-  @IsString()
-  surname: string;
-
-  @IsNotEmpty()
   @IsString()
   password: string;
 
-  @IsInt()
+  @IsString()
   @IsNotEmpty()
-  age: number;
+  age: string;
 }

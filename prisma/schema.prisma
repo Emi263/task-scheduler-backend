@@ -16,17 +16,23 @@ model User {
   updatedAt      DateTime @updatedAt
   email          String   @unique
   hashedPassword String
-  tasks Task[]
+  name           String
+  age            Int
+  tasks          Task[]
+
+
   @@map("users")
-
-
 }
 
 model Task {
-  id Int @id @default(autoincrement())
+  id           Int      @id @default(autoincrement())
+  title        String
+  author       String
+  date         DateTime
+  description  String
+  shouldNotify Boolean  @default(false)
+  userId       Int
+  user         User     @relation(fields: [userId], references: [id])
 
-userId Int 
-user User @relation(fields: [userId], references: [id])
   @@map("tasks")
-
 }

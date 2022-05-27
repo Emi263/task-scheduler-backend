@@ -21,9 +21,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
         id: payload.sub,
       },
     });
-
-    delete user.hashedPassword;
-
-    return user; //what this returns goes to REQ
+    const {hashedPassword,...rest}=user;
+    return rest; //what this returns goes to REQ
   }
 }

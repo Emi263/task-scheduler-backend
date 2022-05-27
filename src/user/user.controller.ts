@@ -15,7 +15,7 @@ export class UserController {
   }
 
   @Get('user/:id')
- async  getUser(@Param('id', ParseIntPipe) id:number) {
-    return  this.userService.getCurrentUser(id);
+  async getUser(@Param('id', ParseIntPipe) id: number) {
+    return this.userService.getCurrentUser(id);
   }
 }

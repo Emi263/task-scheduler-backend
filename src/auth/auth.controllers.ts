@@ -1,7 +1,6 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Post } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { AuthLoginDto,AuthSignupDto } from './dto';
-
+import { AuthLoginDto, AuthSignupDto } from './dto';
 
 @Controller('auth') //anotate the class so nest js knows it is a controller
 export class AuthController {
@@ -15,18 +14,9 @@ export class AuthController {
 
   @Post('login')
   async login(@Body() dto: AuthLoginDto) {
-
-   const user = await this.authService.login(dto);
+    const user = await this.authService.login(dto);
     return user;
   }
-
-@Get('google/auth')
-async googleAuth() {
-
-
-}
-
-
 }
 
 //no need to worry to send the right data type, nest js will do that for us. can be text/html or json
