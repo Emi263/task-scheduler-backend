@@ -17,6 +17,16 @@ async function bootstrap() {
     .setDescription('The task scheduler project api documentation')
     .setVersion('1.0')
     .addTag('task')
+    .addBearerAuth(
+      {
+        name: 'Authorization',
+        type: 'http',
+        scheme: 'Bearer',
+        bearerFormat: 'Bearer',
+        in: 'Header',
+      },
+      'authorization',
+    )
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);

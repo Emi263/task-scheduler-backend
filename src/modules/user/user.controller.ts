@@ -7,26 +7,24 @@ import {
   Post,
   Req,
 } from '@nestjs/common';
-import { UseGuards } from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
 import { Request } from 'express';
 import { ForgotPasswordDto } from './user.dto';
 import { UserService } from './user.service';
+import { UseGuards } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('users')
 export class UserController {
   constructor(private userService: UserService) {}
 
   @Get('')
+  @UseGuards(AuthGuard('jwt'))
   getUsers(@Req() req: Request) {
+    console.log(req.user);
     return this.userService.getAllUsers();
   }
-  @Get('me')
-  getMe(@Req() req: Request) {
-    return req.user;
-  }
 
-  @Get('user/:id')
+  @Get(':id')
   async getUser(@Param('id', ParseIntPipe) id: number) {
     return this.userService.getCurrentUser(id);
   }
