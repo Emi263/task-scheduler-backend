@@ -1,7 +1,6 @@
 import { Body, Controller, Post, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthLoginDto, AuthSignupDto } from './dto';
-import { LocalAuthGuard } from './guards/local-auth.guard';
 
 @Controller('auth') //anotate the class so nest js knows it is a controller
 export class AuthController {
@@ -13,7 +12,6 @@ export class AuthController {
     return user;
   }
 
-  @UseGuards(LocalAuthGuard)
   @Post('login')
   async login(@Body() dto: AuthLoginDto) {
     const user = await this.authService.login(dto);

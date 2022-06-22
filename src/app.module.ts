@@ -6,13 +6,16 @@ import {
 } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { AuthModule } from './auth/auth.module';
-import { PrismaModule } from './prisma/prisma.module';
+import { AuthModule } from './modules/auth/auth.module';
+
+import { PrismaModule } from './modules/prisma/prisma.module';
 import { ConfigModule } from '@nestjs/config';
-import { UserController } from './user/user.controller';
-import { UserModule } from './user/user.module';
-import { UserService } from './user/user.service';
-import { TaskModule } from './task/task.module';
+
+import { UserController } from './modules/user/user.controller';
+import { UserModule } from './modules/user/user.module';
+import { UserService } from './modules/user/user.service';
+import { TaskModule } from './modules/task/task.module';
+
 import { LoggerMiddleware } from './middleware/logger.middleware';
 
 @Module({
