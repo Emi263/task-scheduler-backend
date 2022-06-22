@@ -17,6 +17,10 @@ import { UserService } from './user.service';
 export class UserController {
   constructor(private userService: UserService) {}
 
+  @Get('')
+  getUsers(@Req() req: Request) {
+    return this.userService.getAllUsers();
+  }
   @Get('me')
   getMe(@Req() req: Request) {
     return req.user;

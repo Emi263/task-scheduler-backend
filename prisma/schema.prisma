@@ -20,7 +20,6 @@ model User {
   age            Int
   tasks          Task[]
 
-
   @@map("users")
 }
 
@@ -32,7 +31,8 @@ model Task {
   description  String
   shouldNotify Boolean  @default(false)
   userId       Int
-  user         User     @relation(fields: [userId], references: [id])
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  image        String   @default("")
 
   @@map("tasks")
 }

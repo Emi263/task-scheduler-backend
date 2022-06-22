@@ -20,5 +20,15 @@ export class UserService {
     return user;
   }
 
+  async getAllUsers() {
+    const users = await this.Prisma.user.findMany({
+      include: {
+        tasks: true,
+      },
+    });
+    users.forEach((user) => delete user.hashedPassword);
+    return users;
+  }
+
   async handleForgotPassword(forgotPassDto: ForgotPasswordDto) {}
 }
