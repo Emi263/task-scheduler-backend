@@ -1,4 +1,8 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { PrismaService } from 'src/modules/prisma/prisma.service';
 import * as bycrypt from 'bcrypt';
 import { AuthLoginDto } from './dto';
@@ -22,7 +26,7 @@ export class AuthService {
 
     if (!user) {
       //stop the code and throw an exception
-      throw new ForbiddenException('Credentials incorrect');
+      throw new UnauthorizedException('Credentials incorrect');
     }
 
     const passwordMatches = await bycrypt.compare(
@@ -31,7 +35,7 @@ export class AuthService {
     );
 
     if (!passwordMatches) {
-      throw new ForbiddenException('Incrorrect credentials');
+      throw new ForbiddenException('Insert the right credentials');
     }
 
     return this.signToken(user.id, user.email);
