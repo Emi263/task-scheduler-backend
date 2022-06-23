@@ -42,3 +42,15 @@ export class AuthSignupDto {
   @IsNotEmpty()
   age: string;
 }
+
+export class ChangePasswordDto {
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  currentPassword: string;
+
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  password: string;
+}

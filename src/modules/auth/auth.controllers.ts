@@ -1,7 +1,17 @@
-import { Body, Controller, HttpCode, Post, UseGuards } from '@nestjs/common';
-import { ApiResponse } from '@nestjs/swagger';
+import {
+  Body,
+  Controller,
+  HttpCode,
+  Post,
+  Put,
+  UseGuards,
+} from '@nestjs/common';
+import { ApiOkResponse, ApiResponse } from '@nestjs/swagger';
+import { User } from '@prisma/client';
+import { JwtAuthGuard } from 'src/commons/guards/jwt-auth.guard';
 import { AuthService } from './auth.service';
-import { AuthLoginDto, AuthSignupDto } from './dto';
+import { GetUser } from './decorator/get-user.decorator';
+import { AuthLoginDto, AuthSignupDto, ChangePasswordDto } from './dto';
 
 @Controller('auth') //anotate the class so nest js knows it is a controller
 export class AuthController {
@@ -26,6 +36,26 @@ export class AuthController {
   async login(@Body() userData: AuthLoginDto) {
     const user = await this.authService.login(userData);
     return user;
+  }
+
+  @Post('forgot-password')
+  @ApiOkResponse({
+    status: 200,
+  })
+  async resetPassword(@Body() token: { token: string }) {
+    return this.authService.resetPassword(token.token);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Put('change-password')
+  @ApiOkResponse({
+    status: 200,
+  })
+  async changePassword(
+    @GetUser() user: Partial<User>,
+    @Body() changePasswordBody: ChangePasswordDto,
+  ) {
+    return this.authService.changePassword(user, changePasswordBody);
   }
 }
 

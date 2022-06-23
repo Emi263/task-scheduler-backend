@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { User } from '@prisma/client';
 import { PrismaService } from 'src/modules/prisma/prisma.service';
 
-import { sendEmail } from './helpers/sendEmail';
 import { ForgotPasswordDto } from './user.dto';
 
 @Injectable({})

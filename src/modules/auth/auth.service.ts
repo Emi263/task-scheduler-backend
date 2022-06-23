@@ -1,17 +1,24 @@
 import {
+  BadRequestException,
   ForbiddenException,
   Injectable,
+  NotFoundException,
   UnauthorizedException,
+  UnprocessableEntityException,
 } from '@nestjs/common';
 import { PrismaService } from 'src/modules/prisma/prisma.service';
 import * as bycrypt from 'bcrypt';
-import { AuthLoginDto } from './dto';
+import { AuthLoginDto, ChangePasswordDto } from './dto';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
+import nodemailer from 'nodemailer';
+import sendEmail from 'src/commons/helpers/sendEmail';
 
 @Injectable({}) //anotate, use dependency injection
 export class AuthService {
+  passwordPattern = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/; //minimum 8 characters and at least one letter and 1 number
+
   constructor(
     private prismaService: PrismaService,
     private jwt: JwtService,
@@ -28,7 +35,7 @@ export class AuthService {
     if (!user) {
       throw new UnauthorizedException('Invalid credentials');
     }
-    const passwordMatches = this.checkPassword(
+    const passwordMatches = await this.checkPassword(
       userDto.password,
       user.hashedPassword,
     );
@@ -79,5 +86,84 @@ export class AuthService {
     });
 
     return { token };
+  }
+
+  async resetPassword(token: string) {
+    //decode the user
+
+    const payload: any = this.jwt.decode(token);
+
+    //find if user exists on db
+    const userExists = await this.prismaService.user.findUnique({
+      where: {
+        email: payload.email,
+      },
+    });
+
+    if (!userExists) {
+      throw new NotFoundException('User not found');
+    }
+
+    //generate a new password to user
+
+    // aksfldsjdf;sldfsdsg
+
+    try {
+      await sendEmail('aksfldsjdf;sldfsdsg');
+    } catch (error) {
+      throw error;
+    }
+
+    const user = await this.prismaService.user.update({
+      where: {
+        email: payload.email,
+      },
+      data: {
+        hashedPassword: 'aksfldsjdf;sldfsdsg',
+      },
+    });
+
+    //send an email to use with his new password
+
+    //update the user with the new password
+  }
+
+  async changePassword(requser: any, body: ChangePasswordDto) {
+    //get the user from the db
+
+    const user = await this.prismaService.user.findUnique({
+      where: {
+        email: requser.email,
+      },
+    });
+    if (!user) {
+      throw new NotFoundException();
+    }
+
+    const isCurrentPasswordValid = await this.checkPassword(
+      body.currentPassword,
+      user.hashedPassword,
+    );
+
+    if (!isCurrentPasswordValid) {
+      throw new BadRequestException('Wrong current password');
+    }
+
+    if (!this.passwordPattern.test(body.password)) {
+      throw new UnprocessableEntityException('Weak password');
+    }
+
+    const updatedUser = await this.prismaService.user.update({
+      where: {
+        email: requser.email,
+      },
+      data: {
+        hashedPassword: await bycrypt.hash(body.password, 10),
+      },
+    });
+
+    delete updatedUser.hashedPassword;
+
+    return updatedUser;
   }
 }

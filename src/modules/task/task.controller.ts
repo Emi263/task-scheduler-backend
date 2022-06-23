@@ -7,11 +7,14 @@ import {
   ParseIntPipe,
   Post,
   Put,
+  UseGuards,
 } from '@nestjs/common';
 import { Task } from '@prisma/client';
+import { JwtAuthGuard } from 'src/commons/guards/jwt-auth.guard';
 import { CreateTaskDto, UpdateTaskDto } from './dto/taskDto';
 import { TaskService } from './task.service';
 
+@UseGuards(JwtAuthGuard)
 @Controller('tasks')
 export class TaskController {
   constructor(private taskService: TaskService) {}

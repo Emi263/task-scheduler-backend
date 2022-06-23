@@ -15,7 +15,9 @@ import { AuthGuard } from '@nestjs/passport';
 import { JwtAuthGuard } from '../../commons/guards/jwt-auth.guard';
 import { GetUser } from '../auth/decorator/get-user.decorator';
 import { User } from '@prisma/client';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
+@ApiBearerAuth('authorization')
 @UseGuards(JwtAuthGuard) //applies the guard to user controller
 @Controller('users')
 export class UserController {
