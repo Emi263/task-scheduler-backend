@@ -17,40 +17,41 @@ export class AuthService {
     private jwt: JwtService,
     private config: ConfigService,
   ) {}
-  async login(dto: AuthLoginDto) {
+
+  async login(userDto: AuthLoginDto) {
     const user = await this.prismaService.user.findUnique({
       where: {
-        email: dto.email,
+        email: userDto.email,
       },
     });
 
     if (!user) {
-      //stop the code and throw an exception
-      throw new UnauthorizedException('Credentials incorrect');
+      throw new UnauthorizedException('Invalid credentials');
     }
-
-    const passwordMatches = await bycrypt.compare(
-      dto.password,
+    const passwordMatches = this.checkPassword(
+      userDto.password,
       user.hashedPassword,
     );
 
     if (!passwordMatches) {
-      throw new ForbiddenException('Insert the right credentials');
+      //stop the code and throw an exception
+      throw new UnauthorizedException('Credentials incorrect');
     }
-
     return this.signToken(user.id, user.email);
   }
 
-  async signUp(dto: AuthLoginDto) {
-    console.log(dto);
+  async checkPassword(password: string, hash: string): Promise<boolean> {
+    return await bycrypt.compare(password, hash);
+  }
 
+  async signUp(userDto: AuthLoginDto) {
     //generate the password
     try {
-      const hash = await bycrypt.hash(dto.password, 10);
+      const hash = await bycrypt.hash(userDto.password, 10);
       //save user to the database
       const user = await this.prismaService.user.create({
         data: {
-          email: dto.email,
+          email: userDto.email,
           hashedPassword: hash,
           name: '',
           age: 0,

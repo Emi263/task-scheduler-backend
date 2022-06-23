@@ -7,6 +7,7 @@ import { PrismaService } from 'src/modules/prisma/prisma.service';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
+  //jwt-name of the strategy, AuthGuard can access it authguard('')
   constructor(config: ConfigService, private prisma: PrismaService) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
@@ -16,12 +17,13 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   }
 
   async validate(payload: { sub: number; email: string }) {
+    console.log(payload);
+
     const user = await this.prisma.user.findUnique({
       where: {
         id: payload.sub,
       },
     });
-    console.log(user);
 
     const { hashedPassword, ...rest } = user;
     return rest; //what this returns goes to REQ

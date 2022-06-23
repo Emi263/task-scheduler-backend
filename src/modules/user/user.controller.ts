@@ -12,13 +12,14 @@ import { ForgotPasswordDto } from './user.dto';
 import { UserService } from './user.service';
 import { UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
+import { JwtAuthGuard } from '../../commons/guards/jwt-auth.guard';
 
 @Controller('users')
 export class UserController {
   constructor(private userService: UserService) {}
 
   @Get('')
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(JwtAuthGuard)
   getUsers(@Req() req: Request) {
     console.log(req.user);
     return this.userService.getAllUsers();

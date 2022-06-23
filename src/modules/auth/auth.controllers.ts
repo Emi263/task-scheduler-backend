@@ -1,4 +1,5 @@
-import { Body, Controller, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, HttpCode, Post, UseGuards } from '@nestjs/common';
+import { ApiResponse } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { AuthLoginDto, AuthSignupDto } from './dto';
 
@@ -13,8 +14,17 @@ export class AuthController {
   }
 
   @Post('login')
-  async login(@Body() dto: AuthLoginDto) {
-    const user = await this.authService.login(dto);
+  @HttpCode(200)
+  @ApiResponse({
+    status: 200,
+    description: 'User logged in successfully',
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthorized',
+  })
+  async login(@Body() userData: AuthLoginDto) {
+    const user = await this.authService.login(userData);
     return user;
   }
 }
