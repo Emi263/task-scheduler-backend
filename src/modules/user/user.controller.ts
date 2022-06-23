@@ -13,15 +13,16 @@ import { UserService } from './user.service';
 import { UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { JwtAuthGuard } from '../../commons/guards/jwt-auth.guard';
+import { GetUser } from '../auth/decorator/get-user.decorator';
+import { User } from '@prisma/client';
 
+@UseGuards(JwtAuthGuard) //applies the guard to user controller
 @Controller('users')
 export class UserController {
   constructor(private userService: UserService) {}
 
   @Get('')
-  @UseGuards(JwtAuthGuard)
-  getUsers(@Req() req: Request) {
-    console.log(req.user);
+  getUsers(@GetUser() user: Partial<User>) {
     return this.userService.getAllUsers();
   }
 
