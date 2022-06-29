@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ConflictException,
   ForbiddenException,
   Injectable,
   NotFoundException,
@@ -8,7 +9,7 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from 'src/modules/prisma/prisma.service';
 import * as bycrypt from 'bcrypt';
-import { AuthLoginDto, ChangePasswordDto } from './dto';
+import { AuthLoginDto, AuthSignupDto, ChangePasswordDto } from './dto';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
@@ -51,7 +52,17 @@ export class AuthService {
     return await bycrypt.compare(password, hash);
   }
 
-  async signUp(userDto: AuthLoginDto) {
+  async signUp(userDto: AuthSignupDto) {
+    const userExists = await this.prismaService.user.findUnique({
+      where: {
+        email: userDto.email,
+      },
+    });
+
+    if (userExists) {
+      throw new ConflictException('Request could not be processed');
+    }
+
     //generate the password
     try {
       const hash = await bycrypt.hash(userDto.password, 10);
@@ -60,10 +71,11 @@ export class AuthService {
         data: {
           email: userDto.email,
           hashedPassword: hash,
-          name: '',
-          age: 0,
+          name: userDto.name,
+          age: parseInt(userDto.age),
         },
       });
+
       delete user.hashedPassword;
       return this.signToken(user.id, user.email);
     } catch (err) {

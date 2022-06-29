@@ -1,4 +1,10 @@
 const nodemailer = require('nodemailer');
+import { resolve } from 'path';
+
+const emailTemplate = resolve(
+  __dirname,
+  '../../src/templates/reset_password.ejs',
+);
 
 async function sendEmail(pass: string) {
   //create a fake account

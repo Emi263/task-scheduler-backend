@@ -26,7 +26,6 @@ model User {
 model Task {
   id           Int      @id @default(autoincrement())
   title        String
-  author       String
   date         DateTime
   description  String
   shouldNotify Boolean  @default(false)

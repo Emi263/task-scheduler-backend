@@ -29,11 +29,6 @@ export class CreateTaskDto {
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
-  author: string;
-
-  @ApiProperty()
-  @IsString()
-  @IsNotEmpty()
   description: string;
 
   @ApiProperty()
@@ -66,11 +61,6 @@ export class UpdateTaskDto {
   @IsString()
   @IsOptional()
   title: string;
-
-  @ApiProperty()
-  @IsString()
-  @IsOptional()
-  author: string;
 
   @ApiProperty()
   @IsString()

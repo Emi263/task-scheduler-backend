@@ -17,12 +17,11 @@ import { GetUser } from '../auth/decorator/get-user.decorator';
 import { User } from '@prisma/client';
 import { ApiBearerAuth } from '@nestjs/swagger';
 
-@ApiBearerAuth('authorization')
-@UseGuards(JwtAuthGuard) //applies the guard to user controller
 @Controller('users')
 export class UserController {
   constructor(private userService: UserService) {}
-
+  @ApiBearerAuth('authorization')
+  @UseGuards(JwtAuthGuard) //applies the guard to user controller
   @Get('')
   getUsers(@GetUser() user: Partial<User>) {
     return this.userService.getAllUsers();
