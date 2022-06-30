@@ -11,6 +11,7 @@ import {
 } from '@nestjs/common';
 import { Task } from '@prisma/client';
 import { JwtAuthGuard } from 'src/commons/guards/jwt-auth.guard';
+import { GetUser } from '../auth/decorator/get-user.decorator';
 import { CreateTaskDto, UpdateTaskDto } from './dto/taskDto';
 import { TaskService } from './task.service';
 
@@ -42,7 +43,13 @@ export class TaskController {
   }
 
   @Post('')
-  async createTask(@Body() dto: CreateTaskDto): Promise<Task> {
-    return this.taskService.createTask(dto);
+  async createTask(
+    @GetUser() user: any,
+    @Body() dto: CreateTaskDto,
+  ): Promise<Task> {
+    return this.taskService.createTask({
+      ...dto,
+      userId: user.id,
+    });
   }
 }

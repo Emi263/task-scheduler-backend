@@ -12,12 +12,7 @@ import { Type } from 'class-transformer';
 
 export class CreateTaskDto {
   @ApiProperty()
-  @IsNotEmpty()
-  @IsNumber()
-  id: number;
-
-  @ApiProperty()
-  @IsNotEmpty()
+  @IsOptional()
   @IsNumber()
   userId: number;
 
@@ -43,6 +38,7 @@ export class CreateTaskDto {
 
   @ApiProperty()
   @IsString()
+  @IsOptional()
   image: string;
 }
 
