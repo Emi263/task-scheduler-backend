@@ -5,8 +5,12 @@ import { CreateTaskDto, UpdateTaskDto } from './dto/taskDto';
 @Injectable()
 export class TaskService {
   constructor(private prisma: PrismaService) {}
-  async getAllTasks(): Promise<Task[]> {
-    return await this.prisma.task.findMany();
+  async getAllTasks(user: any): Promise<Task[]> {
+    return await this.prisma.task.findMany({
+      where: {
+        userId: user.id,
+      },
+    });
   }
 
   async getOneTask(id: number): Promise<Task> {
@@ -15,6 +19,19 @@ export class TaskService {
         id,
       },
     });
+  }
+
+  async getTopTasks(user: any): Promise<Task[]> {
+    const tasks = await this.prisma.task.findMany({
+      where: {
+        userId: user.id,
+      },
+      orderBy: {
+        date: 'desc',
+      },
+      take: 4,
+    });
+    return tasks;
   }
 
   async createTask(dto: CreateTaskDto): Promise<Task> {

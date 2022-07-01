@@ -44,16 +44,6 @@ export class CreateTaskDto {
 
 export class UpdateTaskDto {
   @ApiProperty()
-  @IsNotEmpty()
-  @IsNumber()
-  id: number;
-
-  @ApiProperty()
-  @IsOptional()
-  @IsNumber()
-  userId: number;
-
-  @ApiProperty()
   @IsString()
   @IsOptional()
   title: string;

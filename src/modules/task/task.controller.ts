@@ -9,7 +9,7 @@ import {
   Put,
   UseGuards,
 } from '@nestjs/common';
-import { Task } from '@prisma/client';
+import { Task, User } from '@prisma/client';
 import { JwtAuthGuard } from 'src/commons/guards/jwt-auth.guard';
 import { GetUser } from '../auth/decorator/get-user.decorator';
 import { CreateTaskDto, UpdateTaskDto } from './dto/taskDto';
@@ -20,8 +20,13 @@ import { TaskService } from './task.service';
 export class TaskController {
   constructor(private taskService: TaskService) {}
   @Get()
-  async getTasks(): Promise<Task[]> {
-    return await this.taskService.getAllTasks();
+  async getTasks(@GetUser() user: any): Promise<Task[]> {
+    return await this.taskService.getAllTasks(user);
+  }
+
+  @Get('top-tasks')
+  async getTopTasks(@GetUser() user: any): Promise<Task[]> {
+    return await this.taskService.getTopTasks(user);
   }
 
   @Get(':id')
