@@ -1,8 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { User } from '@prisma/client';
+import { NotFoundError } from 'rxjs';
 import { PrismaService } from 'src/modules/prisma/prisma.service';
 
-import { ForgotPasswordDto } from './user.dto';
+import { ForgotPasswordDto, UpdateuserDto } from './user.dto';
 
 @Injectable({})
 export class UserService {
@@ -15,7 +16,9 @@ export class UserService {
       },
     });
 
+    if (!user) throw new NotFoundException();
     delete user.hashedPassword;
+
     return user;
   }
 
@@ -30,4 +33,17 @@ export class UserService {
   }
 
   async handleForgotPassword(forgotPassDto: ForgotPasswordDto) {}
+
+  async updateUser(id: number, data: UpdateuserDto) {
+    const user = await this.Prisma.user.update({
+      where: {
+        id: id,
+      },
+      data: {
+        ...data,
+      },
+    });
+    delete user.hashedPassword;
+    return user;
+  }
 }

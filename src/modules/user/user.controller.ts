@@ -5,10 +5,11 @@ import {
   Param,
   ParseIntPipe,
   Post,
+  Put,
   Req,
 } from '@nestjs/common';
 import { Request } from 'express';
-import { ForgotPasswordDto } from './user.dto';
+import { ForgotPasswordDto, UpdateuserDto } from './user.dto';
 import { UserService } from './user.service';
 import { UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
@@ -34,4 +35,12 @@ export class UserController {
 
   @Post('/forgot-password')
   async forgotPassword(@Body() forgotPassDto: ForgotPasswordDto) {}
+
+  @UseGuards(JwtAuthGuard) //applies the guard to user controller
+  @Put('/change-profile-pic')
+  async updateUser(@Body() userData: UpdateuserDto, @GetUser() user: any) {
+    console.log(user);
+
+    return this.userService.updateUser(user.id, userData);
+  }
 }
