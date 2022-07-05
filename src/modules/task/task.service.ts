@@ -2,6 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { Prisma, Task } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateTaskDto, UpdateTaskDto } from './dto/taskDto';
+import * as fs from 'node:fs';
+
 @Injectable()
 export class TaskService {
   constructor(private prisma: PrismaService) {}
@@ -35,6 +37,8 @@ export class TaskService {
   }
 
   async createTask(dto: CreateTaskDto): Promise<Task> {
+    console.log(dto);
+
     try {
       return await this.prisma.task.create({ data: dto });
     } catch (e) {
@@ -69,5 +73,14 @@ export class TaskService {
     });
 
     return updatedTask;
+  }
+
+  uploadImage(file: any): string {
+    const path = file.path;
+    const image = fs.readFileSync(path, 'base64');
+    //save it to prisma
+    const fullImage = 'data:image/gif;base64,' + image;
+    fs.rmSync(path);
+    return fullImage;
   }
 }
