@@ -37,8 +37,6 @@ export class TaskService {
   }
 
   async createTask(dto: CreateTaskDto): Promise<Task> {
-    console.log(dto);
-
     try {
       return await this.prisma.task.create({ data: dto });
     } catch (e) {
