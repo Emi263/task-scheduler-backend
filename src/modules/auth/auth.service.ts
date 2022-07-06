@@ -80,6 +80,8 @@ export class AuthService {
           hashedPassword: hash,
           name: userDto.name,
           age: parseInt(userDto.age),
+          profileImage: '',
+          isGoogleSignIn: false,
         },
       });
 
@@ -186,7 +188,7 @@ export class AuthService {
     return updatedUser;
   }
 
-  async googleSingIn(googleUserData: GoogleLoginDto) {
+  async googleSignIn(googleUserData: GoogleLoginDto) {
     try {
       const userData: any = await this.getGoogleUserData(googleUserData.token);
 
@@ -208,6 +210,7 @@ export class AuthService {
           age: 20,
           hashedPassword: '',
           profileImage: userData.picture,
+          isGoogleSignIn: true,
         },
       });
 

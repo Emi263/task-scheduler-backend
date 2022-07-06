@@ -16,6 +16,8 @@ export class UserService {
       },
     });
 
+    console.log(user);
+
     if (!user) throw new NotFoundException();
     delete user.hashedPassword;
 

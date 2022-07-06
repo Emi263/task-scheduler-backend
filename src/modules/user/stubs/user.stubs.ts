@@ -9,5 +9,7 @@ export const userStub = (): User => {
     age: 21,
     name: 'test',
     hashedPassword: 'test123',
+    profileImage: '',
+    isGoogleSignIn: false,
   };
 };

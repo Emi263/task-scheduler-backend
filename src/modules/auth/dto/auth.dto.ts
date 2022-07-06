@@ -4,6 +4,7 @@ import {
   IsInt,
   IsNotEmpty,
   IsNumber,
+  IsOptional,
   isString,
   IsString,
   MinLength,
@@ -44,6 +45,10 @@ export class AuthSignupDto {
   @IsString()
   @IsNotEmpty()
   age: string;
+
+  @ApiProperty()
+  @IsOptional()
+  isGoogleSignIn: boolean;
 }
 
 export class GoogleLoginDto {

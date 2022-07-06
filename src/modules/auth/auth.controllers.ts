@@ -45,7 +45,7 @@ export class AuthController {
 
   @Post('google-auth')
   async authenticate(@Body() googleUserData: GoogleLoginDto) {
-    const token = await this.authService.googleSingIn(googleUserData);
+    const token = await this.authService.googleSignIn(googleUserData);
     return token;
   }
 
