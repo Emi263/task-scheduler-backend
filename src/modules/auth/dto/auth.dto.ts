@@ -1,7 +1,10 @@
 import {
+  isEmail,
   IsEmail,
   IsInt,
   IsNotEmpty,
+  IsNumber,
+  isString,
   IsString,
   MinLength,
 } from 'class-validator';
@@ -41,6 +44,13 @@ export class AuthSignupDto {
   @IsString()
   @IsNotEmpty()
   age: string;
+}
+
+export class GoogleLoginDto {
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsString()
+  token: string;
 }
 
 export class ChangePasswordDto {

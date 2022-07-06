@@ -11,7 +11,12 @@ import { User } from '@prisma/client';
 import { JwtAuthGuard } from 'src/commons/guards/jwt-auth.guard';
 import { AuthService } from './auth.service';
 import { GetUser } from './decorator/get-user.decorator';
-import { AuthLoginDto, AuthSignupDto, ChangePasswordDto } from './dto';
+import {
+  AuthLoginDto,
+  AuthSignupDto,
+  ChangePasswordDto,
+  GoogleLoginDto,
+} from './dto';
 
 @Controller('auth') //anotate the class so nest js knows it is a controller
 export class AuthController {
@@ -34,8 +39,14 @@ export class AuthController {
     description: 'Unauthorized',
   })
   async login(@Body() userData: AuthLoginDto) {
-    const user = await this.authService.login(userData);
-    return user;
+    const token = await this.authService.login(userData);
+    return token;
+  }
+
+  @Post('google-auth')
+  async authenticate(@Body() googleUserData: GoogleLoginDto) {
+    const token = await this.authService.googleSingIn(googleUserData);
+    return token;
   }
 
   @Post('forgot-password')

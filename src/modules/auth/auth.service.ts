@@ -9,12 +9,19 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from 'src/modules/prisma/prisma.service';
 import * as bycrypt from 'bcrypt';
-import { AuthLoginDto, AuthSignupDto, ChangePasswordDto } from './dto';
+import {
+  AuthLoginDto,
+  AuthSignupDto,
+  ChangePasswordDto,
+  GoogleLoginDto,
+} from './dto';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import nodemailer from 'nodemailer';
+import { RequestInfo, RequestInit } from 'node-fetch';
 import sendEmail from 'src/commons/helpers/sendEmail';
+import axios from 'axios';
 
 @Injectable({}) //anotate, use dependency injection
 export class AuthService {
@@ -177,5 +184,49 @@ export class AuthService {
     delete updatedUser.hashedPassword;
 
     return updatedUser;
+  }
+
+  async googleSingIn(googleUserData: GoogleLoginDto) {
+    try {
+      const userData: any = await this.getGoogleUserData(googleUserData.token);
+
+      const user = await this.prismaService.user.findUnique({
+        where: {
+          email: userData.email,
+        },
+      });
+
+      //if user do not save it
+      if (user) {
+        return this.signToken(user.id, user.email);
+      }
+
+      const savedUser = await this.prismaService.user.create({
+        data: {
+          email: userData.email,
+          name: userData.given_name,
+          age: 20,
+          hashedPassword: '',
+          profileImage: userData.picture,
+        },
+      });
+
+      return this.signToken(savedUser.id, savedUser.email);
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async getGoogleUserData(token: string) {
+    const { data } = await axios.get(
+      'https://www.googleapis.com/userinfo/v2/me',
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    );
+
+    return data;
   }
 }
