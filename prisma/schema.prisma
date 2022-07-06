@@ -11,16 +11,17 @@ datasource db {
 }
 
 model User {
-  id             Int      @id @default(autoincrement())
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
-  email          String   @unique
-  hashedPassword String
-  name           String
-  age            Int
-  tasks          Task[]
-  isGoogleSignIn Boolean  @default(false)
-  profileImage   String
+  id                   Int      @id @default(autoincrement())
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+  email                String   @unique
+  hashedPassword       String
+  name                 String
+  age                  Int
+  tasks                Task[]
+  isGoogleSignIn       Boolean  @default(false)
+  profileImage         String
+  shouldChangePassword Boolean  @default(false)
 
   @@map("users")
 }

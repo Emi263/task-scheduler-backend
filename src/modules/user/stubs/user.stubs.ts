@@ -11,5 +11,6 @@ export const userStub = (): User => {
     hashedPassword: 'test123',
     profileImage: '',
     isGoogleSignIn: false,
+    shouldChangePassword: false,
   };
 };

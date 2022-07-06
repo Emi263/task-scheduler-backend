@@ -49,6 +49,10 @@ export class AuthSignupDto {
   @ApiProperty()
   @IsOptional()
   isGoogleSignIn: boolean;
+
+  @ApiProperty()
+  @IsOptional()
+  shouldChangePassword: boolean;
 }
 
 export class GoogleLoginDto {
@@ -68,4 +72,11 @@ export class ChangePasswordDto {
   @IsString()
   @IsNotEmpty()
   password: string;
+}
+
+export class forgotPasswordDto {
+  @IsString()
+  @IsEmail()
+  @ApiProperty()
+  email: string;
 }

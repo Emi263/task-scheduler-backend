@@ -15,6 +15,7 @@ import {
   AuthLoginDto,
   AuthSignupDto,
   ChangePasswordDto,
+  forgotPasswordDto,
   GoogleLoginDto,
 } from './dto';
 
@@ -67,6 +68,11 @@ export class AuthController {
     @Body() changePasswordBody: ChangePasswordDto,
   ) {
     return this.authService.changePassword(user, changePasswordBody);
+  }
+
+  @Post('send-email')
+  async sendEmail(@Body() forgotEmail: forgotPasswordDto) {
+    return this.authService.forgotPassword(forgotEmail.email);
   }
 }
 

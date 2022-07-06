@@ -39,8 +39,6 @@ export class UserController {
   @UseGuards(JwtAuthGuard) //applies the guard to user controller
   @Put('/change-profile-pic')
   async updateUser(@Body() userData: UpdateuserDto, @GetUser() user: any) {
-    console.log(user);
-
     return this.userService.updateUser(user.id, userData);
   }
 }
