@@ -12,6 +12,7 @@ export class ScheduleTaskService {
   async addTaskCronJob(name: string, date: string, task: Task) {
     let expo = new Expo();
     let messages = [];
+    //MUST BE DYNAMICALLY RETRIEVED...
     const pushToken = 'ExponentPushToken[oaS65rMC4pwSeH5R1sNcXk]';
     if (!Expo.isExpoPushToken(pushToken)) {
       console.error(`Push token ${pushToken} is not a valid Expo push token`);
@@ -20,7 +21,7 @@ export class ScheduleTaskService {
     messages.push({
       to: pushToken,
       sound: 'default',
-      title: 'Upcomin task!',
+      title: 'Upcoming task!',
       body: `Hello we are notifying you on your task: ${task.title} `,
       data: { ...task },
     });

@@ -20,7 +20,6 @@ import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import sendEmail from 'src/commons/helpers/sendEmail';
 import axios from 'axios';
-import * as nodemailer from 'nodemailer';
 import { MailService } from '../mailService/mail.service';
 
 @Injectable({}) //anotate, use dependency injection
