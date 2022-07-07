@@ -3,10 +3,14 @@ import { Prisma, Task } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateTaskDto, UpdateTaskDto } from './dto/taskDto';
 import * as fs from 'node:fs';
+import { ScheduleTaskService } from '../schedule-tasks/scheduleTask.service';
 
 @Injectable()
 export class TaskService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private scheduleTaskService: ScheduleTaskService,
+  ) {}
   async getAllTasks(user: any): Promise<Task[]> {
     return await this.prisma.task.findMany({
       where: {
@@ -38,7 +42,14 @@ export class TaskService {
 
   async createTask(dto: CreateTaskDto): Promise<Task> {
     try {
-      return await this.prisma.task.create({ data: dto });
+      const task = await this.prisma.task.create({ data: dto });
+
+      await this.scheduleTaskService.addTaskCronJob(
+        task.title + task.id,
+        task.date.toISOString(),
+        task,
+      );
+      return task;
     } catch (e) {
       if (e instanceof Prisma.PrismaClientKnownRequestError) {
         console.log(e instanceof Prisma.PrismaClientKnownRequestError);
