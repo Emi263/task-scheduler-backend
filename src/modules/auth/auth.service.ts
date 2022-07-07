@@ -22,6 +22,8 @@ import sendEmail from 'src/commons/helpers/sendEmail';
 import axios from 'axios';
 import { MailService } from '../mailService/mail.service';
 
+import * as crypto from 'node:crypto';
+
 @Injectable({}) //anotate, use dependency injection
 export class AuthService {
   passwordPattern = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/; //minimum 8 characters and at least one letter and 1 number
@@ -238,9 +240,12 @@ export class AuthService {
         email: email,
       },
     });
+    console.log(user);
 
     if (!user) return new NotFoundException();
-    const randomPass = '123456'; //needs to be random
+    const randomPass = this.generateRandomPass(6); //needs to be random
+    console.log(randomPass);
+
     const hashedPassword = await bycrypt.hash(randomPass, 10);
 
     try {
@@ -260,5 +265,9 @@ export class AuthService {
     });
 
     return newUserData;
+  }
+
+  generateRandomPass(num: number) {
+    return crypto.randomBytes(num / 2).toString('hex');
   }
 }

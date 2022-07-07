@@ -73,9 +73,14 @@ export class TaskService {
     if (!deletedTask) {
       throw new NotFoundException();
     }
-    await this.scheduleTaskService.deleteCronJob(
-      deletedTask.title + deletedTask.id,
-    );
+
+    const jobName = deletedTask.title + deletedTask.id;
+
+    const jobExists = await this.scheduleTaskService.getJob(jobName);
+
+    if (jobExists) {
+      await this.scheduleTaskService.deleteCronJob(jobName);
+    }
 
     return deletedTask;
   }

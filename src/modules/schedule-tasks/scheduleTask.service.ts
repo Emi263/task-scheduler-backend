@@ -51,4 +51,16 @@ export class ScheduleTaskService {
     this.schedulerRegistry.deleteCronJob(name);
     this.logger.debug(`Task with name : ${name} deleted!`);
   }
+
+  async getJob(name: string): Promise<boolean> {
+    try {
+      const job = this.schedulerRegistry.getCronJob(name);
+      if (job) {
+        return true;
+      }
+      return false;
+    } catch (e) {
+      return false;
+    }
+  }
 }
