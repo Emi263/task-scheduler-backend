@@ -18,11 +18,10 @@ import {
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
-
-import { RequestInfo, RequestInit } from 'node-fetch';
 import sendEmail from 'src/commons/helpers/sendEmail';
 import axios from 'axios';
 import * as nodemailer from 'nodemailer';
+import { MailService } from '../mailService/mail.service';
 
 @Injectable({}) //anotate, use dependency injection
 export class AuthService {
@@ -32,6 +31,7 @@ export class AuthService {
     private prismaService: PrismaService,
     private jwt: JwtService,
     private config: ConfigService,
+    private mail: MailService,
   ) {}
 
   async login(userDto: AuthLoginDto) {
@@ -112,7 +112,6 @@ export class AuthService {
 
   async resetPassword(token: string) {
     //decode the user
-
     const payload: any = this.jwt.decode(token);
 
     //find if user exists on db
@@ -152,12 +151,12 @@ export class AuthService {
 
   async changePassword(requser: any, body: ChangePasswordDto) {
     //get the user from the db
-
     const user = await this.prismaService.user.findUnique({
       where: {
         email: requser.email,
       },
     });
+    //if use not found, throw error
     if (!user) {
       throw new NotFoundException();
     }
@@ -193,7 +192,6 @@ export class AuthService {
   async googleSignIn(googleUserData: GoogleLoginDto) {
     try {
       const userData: any = await this.getGoogleUserData(googleUserData.token);
-
       const user = await this.prismaService.user.findUnique({
         where: {
           email: userData.email,
@@ -209,7 +207,7 @@ export class AuthService {
         data: {
           email: userData.email,
           name: userData.given_name,
-          age: 20,
+          age: null,
           hashedPassword: '',
           profileImage: userData.picture,
           isGoogleSignIn: true,
@@ -243,8 +241,14 @@ export class AuthService {
     });
 
     if (!user) return new NotFoundException();
-    const randomPass = '123456';
+    const randomPass = '123456'; //needs to be random
     const hashedPassword = await bycrypt.hash(randomPass, 10);
+
+    try {
+      await this.mail.sendEmail(email, randomPass);
+    } catch (e) {
+      throw e;
+    }
 
     const newUserData = await this.prismaService.user.update({
       where: {
@@ -254,28 +258,6 @@ export class AuthService {
         hashedPassword: hashedPassword,
         shouldChangePassword: true,
       },
-    });
-
-    let mailTransporter = nodemailer.createTransport({
-      host: 'smtp.ethereal.email',
-      port: 587,
-      auth: {
-        user: 'norbert.conn2@ethereal.email',
-        pass: 'hxJ6bWQn397jQPPay1',
-      },
-    });
-
-    let details = {
-      from: 'norbert.conn2@ethereal.email',
-      to: `${email}`,
-      subject: 'test',
-      text: '<h2>Test </h2>',
-      html: `<b>Hello</b> <br> <p>Your one-time password is: ${randomPass}! You chould change the password into your account`,
-    };
-
-    await mailTransporter.sendMail(details, (e, s) => {
-      console.log('error,--- ', e);
-      console.log(s);
     });
 
     return newUserData;

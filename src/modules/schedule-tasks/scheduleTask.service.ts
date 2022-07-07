@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { SchedulerRegistry } from '@nestjs/schedule';
 import { Task } from '@prisma/client';
 import { CronJob } from 'cron';
@@ -7,6 +7,7 @@ import Expo from 'expo-server-sdk';
 @Injectable({})
 export class ScheduleTaskService {
   constructor(private schedulerRegistry: SchedulerRegistry) {}
+  private readonly logger = new Logger();
 
   async addTaskCronJob(name: string, date: string, task: Task) {
     let expo = new Expo();
@@ -43,5 +44,10 @@ export class ScheduleTaskService {
     });
     this.schedulerRegistry.addCronJob(name, job);
     job.start();
+  }
+
+  async deleteCronJob(name: string) {
+    this.schedulerRegistry.deleteCronJob(name);
+    this.logger.debug(`Task with name : ${name} deleted!`);
   }
 }

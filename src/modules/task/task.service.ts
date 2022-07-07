@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma, Task } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateTaskDto, UpdateTaskDto } from './dto/taskDto';
@@ -43,7 +43,6 @@ export class TaskService {
   async createTask(dto: CreateTaskDto): Promise<Task> {
     try {
       const task = await this.prisma.task.create({ data: dto });
-
       await this.scheduleTaskService.addTaskCronJob(
         task.title + task.id,
         task.date.toISOString(),
@@ -65,11 +64,18 @@ export class TaskService {
   }
 
   async deleteTask(id: number) {
-    const deletedTask = this.prisma.task.delete({
+    const deletedTask = await this.prisma.task.delete({
       where: {
         id,
       },
     });
+
+    if (!deletedTask) {
+      throw new NotFoundException();
+    }
+    await this.scheduleTaskService.deleteCronJob(
+      deletedTask.title + deletedTask.id,
+    );
 
     return deletedTask;
   }
@@ -80,6 +86,15 @@ export class TaskService {
       },
       data: body,
     });
+
+    const prevTask = await this.getOneTask(id);
+    const name = prevTask.title + prevTask.id;
+    await this.scheduleTaskService.deleteCronJob(name);
+    await this.scheduleTaskService.addTaskCronJob(
+      updatedTask.title + updatedTask.id,
+      updatedTask.date.toISOString(),
+      updatedTask,
+    );
 
     return updatedTask;
   }
