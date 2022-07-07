@@ -94,7 +94,13 @@ export class TaskService {
 
     const prevTask = await this.getOneTask(id);
     const name = prevTask.title + prevTask.id;
-    await this.scheduleTaskService.deleteCronJob(name);
+
+    const jobExists = await this.scheduleTaskService.getJob(name);
+
+    if (jobExists) {
+      await this.scheduleTaskService.deleteCronJob(name);
+    }
+
     await this.scheduleTaskService.addTaskCronJob(
       updatedTask.title + updatedTask.id,
       updatedTask.date.toISOString(),
