@@ -208,7 +208,7 @@ export class AuthService {
         data: {
           email: userData.email,
           name: userData.given_name,
-          age: null,
+          age: 20,
           hashedPassword: '',
           profileImage: userData.picture,
           isGoogleSignIn: true,
