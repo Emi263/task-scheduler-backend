@@ -3,6 +3,7 @@ import {
   ConflictException,
   ForbiddenException,
   Injectable,
+  NotAcceptableException,
   NotFoundException,
   UnauthorizedException,
   UnprocessableEntityException,
@@ -18,7 +19,6 @@ import {
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
-import sendEmail from 'src/commons/helpers/sendEmail';
 import axios from 'axios';
 import { MailService } from '../mailService/mail.service';
 
@@ -111,45 +111,6 @@ export class AuthService {
     return { token };
   }
 
-  async resetPassword(token: string) {
-    //decode the user
-    const payload: any = this.jwt.decode(token);
-
-    //find if user exists on db
-    const userExists = await this.prismaService.user.findUnique({
-      where: {
-        email: payload.email,
-      },
-    });
-
-    if (!userExists) {
-      throw new NotFoundException('User not found');
-    }
-
-    //generate a new password to user
-
-    // aksfldsjdf;sldfsdsg
-
-    try {
-      await sendEmail('aksfldsjdf;sldfsdsg');
-    } catch (error) {
-      throw error;
-    }
-
-    const user = await this.prismaService.user.update({
-      where: {
-        email: payload.email,
-      },
-      data: {
-        hashedPassword: 'aksfldsjdf;sldfsdsg',
-      },
-    });
-
-    //send an email to use with his new password
-
-    //update the user with the new password
-  }
-
   async changePassword(requser: any, body: ChangePasswordDto) {
     //get the user from the db
     const user = await this.prismaService.user.findUnique({
@@ -240,11 +201,17 @@ export class AuthService {
         email: email,
       },
     });
+
     console.log(user);
 
     if (!user) return new NotFoundException();
+
+    if (user.isGoogleSignIn) {
+      return new NotAcceptableException(
+        'User with this email cannot have his password resetted',
+      );
+    }
     const randomPass = this.generateRandomPass(6); //needs to be random
-    console.log(randomPass);
 
     const hashedPassword = await bycrypt.hash(randomPass, 10);
 

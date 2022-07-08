@@ -12,7 +12,7 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { Task, User } from '@prisma/client';
+import { Task } from '@prisma/client';
 import { JwtAuthGuard } from 'src/commons/guards/jwt-auth.guard';
 import { GetUser } from '../auth/decorator/get-user.decorator';
 import { CreateTaskDto, UpdateTaskDto } from './dto/taskDto';

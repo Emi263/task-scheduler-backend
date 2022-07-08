@@ -4,15 +4,11 @@ import {
   Get,
   Param,
   ParseIntPipe,
-  Post,
   Put,
-  Req,
 } from '@nestjs/common';
-import { Request } from 'express';
-import { ForgotPasswordDto, UpdateuserDto } from './user.dto';
+import { UpdateuserDto } from './user.dto';
 import { UserService } from './user.service';
 import { UseGuards } from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
 import { JwtAuthGuard } from '../../commons/guards/jwt-auth.guard';
 import { GetUser } from '../auth/decorator/get-user.decorator';
 import { User } from '@prisma/client';

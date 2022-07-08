@@ -50,14 +50,6 @@ export class AuthController {
     return token;
   }
 
-  @Post('forgot-password')
-  @ApiOkResponse({
-    status: 200,
-  })
-  async resetPassword(@Body() token: { token: string }) {
-    return this.authService.resetPassword(token.token);
-  }
-
   @UseGuards(JwtAuthGuard)
   @Put('change-password')
   @ApiOkResponse({
@@ -74,7 +66,6 @@ export class AuthController {
   async sendEmail(@Body() forgotEmail: forgotPasswordDto) {
     const res = await this.authService.forgotPassword(forgotEmail.email);
     console.log(res);
-
     return res;
   }
 }

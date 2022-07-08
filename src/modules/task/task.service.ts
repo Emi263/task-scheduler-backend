@@ -112,6 +112,7 @@ export class TaskService {
     return updatedTask;
   }
 
+  //works only in postman. Not implemented in FrontEnd
   uploadImage(file: any): string {
     const path = file.path;
     const image = fs.readFileSync(path, 'base64');

@@ -10,6 +10,8 @@ export class ScheduleTaskService {
   private readonly logger = new Logger();
 
   async addTaskCronJob(name: string, date: string, task: Task) {
+    console.log('Added', name);
+
     let expo = new Expo();
     let messages = [];
     //MUST BE DYNAMICALLY RETRIEVED...
@@ -29,7 +31,7 @@ export class ScheduleTaskService {
     let tickets = [];
 
     const job = new CronJob(new Date(date), () => {
-      console.log('Job added at: ', new Date(date).toLocaleDateString());
+      console.log('Job added at: ', new Date(date).toLocaleString());
 
       (async () => {
         for (let chunk of chunks) {
