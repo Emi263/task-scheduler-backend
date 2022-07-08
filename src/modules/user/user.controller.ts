@@ -33,9 +33,6 @@ export class UserController {
     return this.userService.getCurrentUser(id);
   }
 
-  @Post('/forgot-password')
-  async forgotPassword(@Body() forgotPassDto: ForgotPasswordDto) {}
-
   @UseGuards(JwtAuthGuard) //applies the guard to user controller
   @Put('/change-profile-pic')
   async updateUser(@Body() userData: UpdateuserDto, @GetUser() user: any) {

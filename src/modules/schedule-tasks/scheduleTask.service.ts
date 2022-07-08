@@ -13,7 +13,7 @@ export class ScheduleTaskService {
     let expo = new Expo();
     let messages = [];
     //MUST BE DYNAMICALLY RETRIEVED...
-    const pushToken = 'ExponentPushToken[oaS65rMC4pwSeH5R1sNcXk]';
+    const pushToken = 'ExponentPushToken[SO9B5FMCINST6H-cG4zS4c]';
     if (!Expo.isExpoPushToken(pushToken)) {
       console.error(`Push token ${pushToken} is not a valid Expo push token`);
       return;

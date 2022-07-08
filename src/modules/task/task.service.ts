@@ -43,11 +43,13 @@ export class TaskService {
   async createTask(dto: CreateTaskDto): Promise<Task> {
     try {
       const task = await this.prisma.task.create({ data: dto });
-      await this.scheduleTaskService.addTaskCronJob(
-        task.title + task.id,
-        task.date.toISOString(),
-        task,
-      );
+      if (task.shouldNotify) {
+        await this.scheduleTaskService.addTaskCronJob(
+          task.title + task.id,
+          task.date.toISOString(),
+          task,
+        );
+      }
       return task;
     } catch (e) {
       if (e instanceof Prisma.PrismaClientKnownRequestError) {
@@ -94,18 +96,18 @@ export class TaskService {
 
     const prevTask = await this.getOneTask(id);
     const name = prevTask.title + prevTask.id;
-
     const jobExists = await this.scheduleTaskService.getJob(name);
-
     if (jobExists) {
       await this.scheduleTaskService.deleteCronJob(name);
     }
 
-    await this.scheduleTaskService.addTaskCronJob(
-      updatedTask.title + updatedTask.id,
-      updatedTask.date.toISOString(),
-      updatedTask,
-    );
+    if (updatedTask.shouldNotify) {
+      await this.scheduleTaskService.addTaskCronJob(
+        updatedTask.title + updatedTask.id,
+        updatedTask.date.toISOString(),
+        updatedTask,
+      );
+    }
 
     return updatedTask;
   }
