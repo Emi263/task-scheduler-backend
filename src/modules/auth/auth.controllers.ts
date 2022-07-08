@@ -62,7 +62,7 @@ export class AuthController {
     return this.authService.changePassword(user, changePasswordBody);
   }
 
-  @Post('send-email')
+  @Post('forgot-password')
   async sendEmail(@Body() forgotEmail: forgotPasswordDto) {
     const res = await this.authService.forgotPassword(forgotEmail.email);
     console.log(res);
