@@ -4,6 +4,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { CreateTaskDto, UpdateTaskDto } from './dto/taskDto';
 import * as fs from 'node:fs';
 import { ScheduleTaskService } from '../schedule-tasks/scheduleTask.service';
+import { sameDay } from './helper';
 
 @Injectable()
 export class TaskService {
@@ -28,6 +29,28 @@ export class TaskService {
   }
 
   async getTopTasks(user: any): Promise<Task[]> {
+    const currentDate = new Date();
+    currentDate.setHours(0, 0, 0, 0);
+
+    const tasks = await this.prisma.task.findMany({
+      where: {
+        userId: user.id,
+        date: {
+          gte: currentDate,
+        },
+      },
+      orderBy: {
+        date: 'desc',
+      },
+
+      take: 3,
+    });
+    console.log(tasks);
+
+    return tasks;
+  }
+
+  async getTodayTasks(user: any): Promise<Task[]> {
     const tasks = await this.prisma.task.findMany({
       where: {
         userId: user.id,
@@ -35,11 +58,11 @@ export class TaskService {
       orderBy: {
         date: 'desc',
       },
-      take: 4,
     });
-    return tasks;
-  }
+    const todayTasks = tasks.filter((task) => sameDay(task.date));
 
+    return todayTasks;
+  }
   async createTask(dto: CreateTaskDto): Promise<Task> {
     try {
       const task = await this.prisma.task.create({ data: dto });

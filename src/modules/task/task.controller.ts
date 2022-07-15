@@ -35,6 +35,11 @@ export class TaskController {
     return await this.taskService.getTopTasks(user);
   }
 
+  @Get('task-today')
+  async getTodayTasks(@GetUser() user: any): Promise<Task[]> {
+    return await this.taskService.getTodayTasks(user);
+  }
+  ç;
   @Get(':id')
   async getTask(@Param('id', ParseIntPipe) id: number): Promise<Task> {
     return this.taskService.getOneTask(id);
