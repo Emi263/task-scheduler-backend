@@ -20,6 +20,7 @@ import { TaskService } from './task.service';
 import { diskStorage } from 'multer';
 import { randomBytes } from 'node:crypto';
 import { parse } from 'node:path';
+import { ApiProperty } from '@nestjs/swagger';
 
 @UseGuards(JwtAuthGuard)
 @Controller('tasks')
@@ -39,7 +40,19 @@ export class TaskController {
   async getTodayTasks(@GetUser() user: any): Promise<Task[]> {
     return await this.taskService.getTodayTasks(user);
   }
-  ç;
+
+  @ApiProperty({
+    description:
+      'Returns the data for the graph, for the past 2 days, today and future 2 days',
+    isArray: true,
+  })
+  @Get('task-graph-values')
+  async getTaskGraphValues(
+    @GetUser() user: any,
+  ): Promise<{ day: string; number_of_tasks: number }[]> {
+    return await this.taskService.getTaskGraphValues(user);
+  }
+
   @Get(':id')
   async getTask(@Param('id', ParseIntPipe) id: number): Promise<Task> {
     return this.taskService.getOneTask(id);

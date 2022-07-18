@@ -1,17 +1,22 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { Prisma, Task } from '@prisma/client';
+import { prisma, Prisma, Task } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateTaskDto, UpdateTaskDto } from './dto/taskDto';
 import * as fs from 'node:fs';
 import { ScheduleTaskService } from '../schedule-tasks/scheduleTask.service';
 import { sameDay } from './helper';
 
+interface SeriesObject {
+  day: string;
+  number_of_tasks: number;
+}
 @Injectable()
 export class TaskService {
   constructor(
     private prisma: PrismaService,
     private scheduleTaskService: ScheduleTaskService,
   ) {}
+
   async getAllTasks(user: any): Promise<Task[]> {
     return await this.prisma.task.findMany({
       where: {
@@ -63,6 +68,29 @@ export class TaskService {
 
     return todayTasks;
   }
+
+  async getTaskGraphValues(user: any): Promise<SeriesObject[]> {
+    const { twoDaysAgo, afterTwoDays } = prevAndFutureDates();
+    const tasks = await this.prisma.task.findMany({
+      where: {
+        userId: user.id,
+        date: {
+          gte: twoDaysAgo,
+          lte: afterTwoDays,
+        },
+      },
+      orderBy: {
+        date: 'asc',
+      },
+    });
+
+    const result: SeriesObject[] = await this.prisma
+      .$queryRaw`SELECT DATE_TRUNC ('day', date) AS day, COUNT(id) AS number_of_tasks FROM tasks 
+      WHERE "userId" =${user.id} AND (date BETWEEN ${twoDaysAgo} AND ${afterTwoDays}) GROUP BY DATE_TRUNC('day', date);`;
+    const finalResult = fillEmptyDays(result);
+    return finalResult;
+  }
+
   async createTask(dto: CreateTaskDto): Promise<Task> {
     try {
       const task = await this.prisma.task.create({ data: dto });
@@ -145,3 +173,67 @@ export class TaskService {
     return fullImage;
   }
 }
+
+//helpers => MAY BE EXTRACTED TO A SPECIFIC FILE
+
+const prevAndFutureDates = () => {
+  const twoDaysAgo = new Date();
+  const afterTwoDays = new Date();
+  twoDaysAgo.setDate(twoDaysAgo.getDate() - 2);
+  twoDaysAgo.setHours(0, 0, 0, 0);
+
+  afterTwoDays.setDate(afterTwoDays.getDate() + 2);
+  afterTwoDays.setHours(24, 0, 0, 0);
+
+  return {
+    twoDaysAgo,
+    afterTwoDays,
+  };
+};
+
+const fillEmptyDays = (result: SeriesObject[]) => {
+  const { twoDaysAgo, afterTwoDays } = prevAndFutureDates();
+  const map = new Map();
+
+  const today = new Date();
+
+  let tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+
+  let yesterday = new Date();
+  yesterday.setDate(yesterday.getDate() - 1);
+
+  //dates we are interested in
+  const dates = [twoDaysAgo, yesterday, today, tomorrow, afterTwoDays];
+
+  //populate the data by default values
+  dates.forEach((date) => {
+    return map.set(getDateString(date), {
+      day: date,
+      number_of_tasks: 0,
+    });
+  });
+
+  //override the data based on result
+  result.forEach((res) => {
+    if (res.day) {
+      return map.set(getDateString(new Date(res.day)), {
+        day: new Date(res.day),
+        number_of_tasks: res.number_of_tasks,
+      });
+    }
+
+    return;
+  });
+
+  const finalArray: SeriesObject[] = dates.map((date) => {
+    let item = map.get(getDateString(date));
+    return item;
+  });
+
+  return finalArray;
+};
+
+const getDateString = (date: Date) => {
+  return date.toISOString().split('T')[0];
+};
