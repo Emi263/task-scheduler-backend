@@ -53,6 +53,11 @@ export class TaskController {
     return await this.taskService.getTaskGraphValues(user);
   }
 
+  @Get('tasks-last-week')
+  async getLastWeekTasks(@GetUser() user: any): Promise<Task[]> {
+    return await this.taskService.getLastWeekTasks(user);
+  }
+
   @Get(':id')
   async getTask(@Param('id', ParseIntPipe) id: number): Promise<Task> {
     return this.taskService.getOneTask(id);

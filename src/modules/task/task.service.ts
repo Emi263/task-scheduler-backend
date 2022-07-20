@@ -22,6 +22,9 @@ export class TaskService {
       where: {
         userId: user.id,
       },
+      orderBy: {
+        date: 'asc',
+      },
     });
   }
 
@@ -64,11 +67,29 @@ export class TaskService {
         date: 'desc',
       },
     });
+
+    console.log(tasks);
+
     const todayTasks = tasks.filter((task) => sameDay(task.date));
 
     return todayTasks;
   }
 
+  async getLastWeekTasks(user: any) {
+    const tasks = await this.prisma.task.findMany({
+      where: {
+        userId: user.id,
+        date: {
+          gte: getLastWeeksDate(),
+        },
+      },
+      orderBy: {
+        date: 'asc',
+      },
+    });
+
+    return tasks;
+  }
   async getTaskGraphValues(user: any): Promise<SeriesObject[]> {
     const { twoDaysAgo, afterTwoDays } = prevAndFutureDates();
     const tasks = await this.prisma.task.findMany({
@@ -180,7 +201,7 @@ const prevAndFutureDates = () => {
   const twoDaysAgo = new Date();
   const afterTwoDays = new Date();
   twoDaysAgo.setDate(twoDaysAgo.getDate() - 2);
-  twoDaysAgo.setHours(0, 0, 0, 0);
+  twoDaysAgo.setHours(7, 0, 0);
 
   afterTwoDays.setDate(afterTwoDays.getDate() + 2);
   afterTwoDays.setHours(24, 0, 0, 0);
@@ -237,3 +258,9 @@ const fillEmptyDays = (result: SeriesObject[]) => {
 const getDateString = (date: Date) => {
   return date.toISOString().split('T')[0];
 };
+
+function getLastWeeksDate() {
+  const now = new Date();
+
+  return new Date(now.getFullYear(), now.getMonth(), now.getDate() - 7);
+}
