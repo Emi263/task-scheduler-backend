@@ -26,16 +26,29 @@ import { ApiProperty } from '@nestjs/swagger';
 @Controller('tasks')
 export class TaskController {
   constructor(private taskService: TaskService) {}
+
+  @ApiProperty({
+    name: 'Get all tasks',
+    description: 'Get all tasks for a user',
+  })
   @Get()
   async getTasks(@GetUser() user: any): Promise<Task[]> {
     return await this.taskService.getAllTasks(user);
   }
 
+  @ApiProperty({
+    name: 'Get latest tasks',
+    description: 'Get 3 latest tasks',
+  })
   @Get('top-tasks')
   async getTopTasks(@GetUser() user: any): Promise<Task[]> {
     return await this.taskService.getTopTasks(user);
   }
 
+  @ApiProperty({
+    name: 'Get  today tasks',
+    description: 'Get all the tasks scheduled for the current date',
+  })
   @Get('task-today')
   async getTodayTasks(@GetUser() user: any): Promise<Task[]> {
     return await this.taskService.getTodayTasks(user);
@@ -53,21 +66,34 @@ export class TaskController {
     return await this.taskService.getTaskGraphValues(user);
   }
 
+  @ApiProperty({
+    name: 'Get last week tasks',
+    description: 'Returns the tasks created by the user in the last week',
+  })
   @Get('tasks-last-week')
   async getLastWeekTasks(@GetUser() user: any): Promise<Task[]> {
     return await this.taskService.getLastWeekTasks(user);
   }
 
+  @ApiProperty({
+    description: 'Returns a specific task',
+  })
   @Get(':id')
   async getTask(@Param('id', ParseIntPipe) id: number): Promise<Task> {
     return this.taskService.getOneTask(id);
   }
 
+  @ApiProperty({
+    description: 'Delete a single task',
+  })
   @Delete(':id')
   async deleteTask(@Param('id', ParseIntPipe) id: number): Promise<Task> {
     return this.taskService.deleteTask(id);
   }
 
+  @ApiProperty({
+    description: 'Update a task',
+  })
   @Put(':id')
   async updateTask(
     @Body() body: UpdateTaskDto,
@@ -76,6 +102,9 @@ export class TaskController {
     return this.taskService.updateTask(id, body);
   }
 
+  @ApiProperty({
+    description: 'Create a task',
+  })
   @Post('')
   async createTask(
     @GetUser() user: any,
@@ -85,25 +114,5 @@ export class TaskController {
       ...dto,
       userId: user.id,
     });
-  }
-
-  @Post('upload')
-  @UseInterceptors(
-    FileInterceptor('file', {
-      storage: diskStorage({
-        destination: './uploads/profileImage',
-        filename: (req, file, cb) => {
-          const filename =
-            parse(file.originalname).name.replace(/\s/g, '') +
-            randomBytes(64).toString('hex');
-          const ext = parse(file.originalname).ext;
-
-          cb(null, `${filename}${ext}`);
-        },
-      }),
-    }),
-  )
-  uploadFile(@UploadedFile() file) {
-    return this.taskService.uploadImage(file);
   }
 }

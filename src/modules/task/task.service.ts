@@ -4,9 +4,14 @@ import { PrismaService } from '../prisma/prisma.service';
 import { CreateTaskDto, UpdateTaskDto } from './dto/taskDto';
 import * as fs from 'node:fs';
 import { ScheduleTaskService } from '../schedule-tasks/scheduleTask.service';
-import { sameDay } from './helper';
+import {
+  fillEmptyDays,
+  getLastWeeksDate,
+  prevAndFutureDates,
+  sameDay,
+} from './helper';
 
-interface SeriesObject {
+export interface SeriesObject {
   day: string;
   number_of_tasks: number;
 }
@@ -183,86 +188,4 @@ export class TaskService {
 
     return updatedTask;
   }
-
-  //works only in postman. Not implemented in FrontEnd
-  uploadImage(file: any): string {
-    const path = file.path;
-    const image = fs.readFileSync(path, 'base64');
-    //save it to prisma
-    const fullImage = 'data:image/gif;base64,' + image;
-    fs.rmSync(path);
-    return fullImage;
-  }
-}
-
-//helpers => MAY BE EXTRACTED TO A SPECIFIC FILE
-
-const prevAndFutureDates = () => {
-  const twoDaysAgo = new Date();
-  const afterTwoDays = new Date();
-  twoDaysAgo.setDate(twoDaysAgo.getDate() - 2);
-  twoDaysAgo.setHours(7, 0, 0);
-
-  console.log(twoDaysAgo);
-
-  afterTwoDays.setDate(afterTwoDays.getDate() + 2);
-  afterTwoDays.setHours(23, 59, 59, 0);
-
-  return {
-    twoDaysAgo,
-    afterTwoDays,
-  };
-};
-
-const fillEmptyDays = (result: SeriesObject[]) => {
-  const { twoDaysAgo, afterTwoDays } = prevAndFutureDates();
-  const map = new Map();
-
-  const today = new Date();
-
-  let tomorrow = new Date();
-  tomorrow.setDate(tomorrow.getDate() + 1);
-
-  let yesterday = new Date();
-  yesterday.setDate(yesterday.getDate() - 1);
-
-  //dates we are interested in
-  const dates = [twoDaysAgo, yesterday, today, tomorrow, afterTwoDays];
-
-  //populate the data by default values
-  dates.forEach((date) => {
-    return map.set(getDateString(date), {
-      day: date,
-      number_of_tasks: 0,
-    });
-  });
-
-  //override the data based on result
-  result.forEach((res) => {
-    if (res.day) {
-      return map.set(getDateString(new Date(res.day)), {
-        day: new Date(res.day),
-        number_of_tasks: res.number_of_tasks,
-      });
-    }
-
-    return;
-  });
-
-  const finalArray: SeriesObject[] = dates.map((date) => {
-    let item = map.get(getDateString(date));
-    return item;
-  });
-
-  return finalArray;
-};
-
-const getDateString = (date: Date) => {
-  return date.toISOString().split('T')[0];
-};
-
-function getLastWeeksDate() {
-  const now = new Date();
-
-  return new Date(now.getFullYear(), now.getMonth(), now.getDate() - 7);
 }
