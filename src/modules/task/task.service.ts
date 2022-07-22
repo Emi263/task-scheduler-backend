@@ -203,8 +203,10 @@ const prevAndFutureDates = () => {
   twoDaysAgo.setDate(twoDaysAgo.getDate() - 2);
   twoDaysAgo.setHours(7, 0, 0);
 
+  console.log(twoDaysAgo);
+
   afterTwoDays.setDate(afterTwoDays.getDate() + 2);
-  afterTwoDays.setHours(24, 0, 0, 0);
+  afterTwoDays.setHours(23, 59, 59, 0);
 
   return {
     twoDaysAgo,

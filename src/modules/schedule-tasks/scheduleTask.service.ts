@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { SchedulerRegistry } from '@nestjs/schedule';
 import { Task } from '@prisma/client';
 import { CronJob } from 'cron';
@@ -10,6 +10,10 @@ export class ScheduleTaskService {
   private readonly logger = new Logger();
 
   async addTaskCronJob(name: string, date: string, task: Task) {
+    if (new Date(date) < new Date()) {
+      throw new BadRequestException('Date is in the past');
+    }
+
     console.log('Added', name);
 
     let expo = new Expo();
