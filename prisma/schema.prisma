@@ -22,6 +22,7 @@ model User {
   isGoogleSignIn       Boolean  @default(false)
   profileImage         String
   shouldChangePassword Boolean  @default(false)
+  expoToken            String   @default("")
 
   @@map("users")
 }
