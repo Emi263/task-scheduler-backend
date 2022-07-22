@@ -30,6 +30,15 @@ export class UserController {
   }
 
   @UseGuards(JwtAuthGuard) //applies the guard to user controller
+  @Put('token')
+  async updateExpoToken(
+    @GetUser() user: Partial<User>,
+    @Body() token: { expotoken: string },
+  ) {
+    return this.userService.updateExpoToken(user, token.expotoken);
+  }
+
+  @UseGuards(JwtAuthGuard) //applies the guard to user controller
   @Put('/change-profile-pic')
   async updateUser(@Body() userData: UpdateuserDto, @GetUser() user: any) {
     return this.userService.updateUser(user.id, userData);

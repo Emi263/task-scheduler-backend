@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { prisma, Prisma, Task } from '@prisma/client';
+import { prisma, Prisma, Task, User } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateTaskDto, UpdateTaskDto } from './dto/taskDto';
 import * as fs from 'node:fs';
@@ -58,7 +58,6 @@ export class TaskService {
 
       take: 3,
     });
-    console.log(tasks);
 
     return tasks;
   }
@@ -72,8 +71,6 @@ export class TaskService {
         date: 'desc',
       },
     });
-
-    console.log(tasks);
 
     const todayTasks = tasks.filter((task) => sameDay(task.date));
 
@@ -120,11 +117,19 @@ export class TaskService {
   async createTask(dto: CreateTaskDto): Promise<Task> {
     try {
       const task = await this.prisma.task.create({ data: dto });
+      const user = await this.prisma.user.findUnique({
+        where: {
+          id: dto.userId,
+        },
+      });
+
+      const token = user.expoToken;
       if (task.shouldNotify) {
         await this.scheduleTaskService.addTaskCronJob(
           task.title + task.id,
           task.date.toISOString(),
           task,
+          token,
         );
       }
       return task;
@@ -163,7 +168,7 @@ export class TaskService {
 
     return deletedTask;
   }
-  async updateTask(id: number, body: UpdateTaskDto) {
+  async updateTask(id: number, body: UpdateTaskDto, user: Partial<User>) {
     const updatedTask = await this.prisma.task.update({
       where: {
         id,
@@ -177,12 +182,18 @@ export class TaskService {
     if (jobExists) {
       await this.scheduleTaskService.deleteCronJob(name);
     }
+    const currentUser = await this.prisma.user.findUnique({
+      where: {
+        id: user.id,
+      },
+    });
 
     if (updatedTask.shouldNotify) {
       await this.scheduleTaskService.addTaskCronJob(
         updatedTask.title + updatedTask.id,
         updatedTask.date.toISOString(),
         updatedTask,
+        currentUser.expoToken,
       );
     }
 

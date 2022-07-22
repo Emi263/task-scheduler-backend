@@ -43,4 +43,27 @@ export class UserService {
     delete user.hashedPassword;
     return user;
   }
+
+  async updateExpoToken(user: Partial<User>, token: string): Promise<string> {
+    const currentUser = await this.Prisma.user.findUnique({
+      where: {
+        id: user.id,
+      },
+    });
+
+    if (currentUser.expoToken === token) {
+      return currentUser.expoToken;
+    }
+
+    const updatedUser = await this.Prisma.user.update({
+      where: {
+        id: user.id,
+      },
+      data: {
+        expoToken: token,
+      },
+    });
+
+    return updatedUser.expoToken;
+  }
 }

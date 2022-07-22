@@ -12,5 +12,6 @@ export const userStub = (): User => {
     profileImage: '',
     isGoogleSignIn: false,
     shouldChangePassword: false,
+    expoToken: '',
   };
 };

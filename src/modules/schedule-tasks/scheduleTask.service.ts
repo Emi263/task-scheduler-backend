@@ -3,13 +3,17 @@ import { SchedulerRegistry } from '@nestjs/schedule';
 import { Task } from '@prisma/client';
 import { CronJob } from 'cron';
 import Expo from 'expo-server-sdk';
+import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable({})
 export class ScheduleTaskService {
-  constructor(private schedulerRegistry: SchedulerRegistry) {}
+  constructor(
+    private schedulerRegistry: SchedulerRegistry,
+    private Prisma: PrismaService,
+  ) {}
   private readonly logger = new Logger();
 
-  async addTaskCronJob(name: string, date: string, task: Task) {
+  async addTaskCronJob(name: string, date: string, task: Task, token: string) {
     if (new Date(date) < new Date()) {
       throw new BadRequestException('Date is in the past');
     }
@@ -18,8 +22,8 @@ export class ScheduleTaskService {
 
     let expo = new Expo();
     let messages = [];
-    //MUST BE DYNAMICALLY RETRIEVED...
-    const pushToken = 'ExponentPushToken[-eB-ZKEWeJOpgExEhaREyl]';
+
+    const pushToken = token;
     if (!Expo.isExpoPushToken(pushToken)) {
       console.error(`Push token ${pushToken} is not a valid Expo push token`);
       return;

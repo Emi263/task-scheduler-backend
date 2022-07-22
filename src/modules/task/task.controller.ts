@@ -12,7 +12,7 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { Task } from '@prisma/client';
+import { Task, User } from '@prisma/client';
 import { JwtAuthGuard } from 'src/commons/guards/jwt-auth.guard';
 import { GetUser } from '../auth/decorator/get-user.decorator';
 import { CreateTaskDto, UpdateTaskDto } from './dto/taskDto';
@@ -98,8 +98,9 @@ export class TaskController {
   async updateTask(
     @Body() body: UpdateTaskDto,
     @Param('id', ParseIntPipe) id: number,
+    @GetUser() user: Partial<User>,
   ): Promise<Task> {
-    return this.taskService.updateTask(id, body);
+    return this.taskService.updateTask(id, body, user);
   }
 
   @ApiProperty({
