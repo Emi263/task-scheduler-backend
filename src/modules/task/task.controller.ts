@@ -20,9 +20,10 @@ import { TaskService } from './task.service';
 import { diskStorage } from 'multer';
 import { randomBytes } from 'node:crypto';
 import { parse } from 'node:path';
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiTags } from '@nestjs/swagger';
 
 @UseGuards(JwtAuthGuard)
+@ApiTags('Task')
 @Controller('tasks')
 export class TaskController {
   constructor(private taskService: TaskService) {}

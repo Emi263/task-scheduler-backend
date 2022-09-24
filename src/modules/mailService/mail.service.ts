@@ -4,7 +4,7 @@ import * as nodemailer from 'nodemailer';
 @Injectable()
 export class MailService {
   async sendEmail(email: string, randomPass: string) {
-    let mailTransporter = nodemailer.createTransport({
+    const mailTransporter = nodemailer.createTransport({
       host: 'smtp.ethereal.email',
       port: 587,
       auth: {
@@ -13,7 +13,7 @@ export class MailService {
       },
     });
 
-    let details = {
+    const details = {
       from: 'norbert.conn2@ethereal.email',
       to: `${email}`,
       subject: 'test',

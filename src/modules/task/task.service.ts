@@ -92,21 +92,9 @@ export class TaskService {
 
     return tasks;
   }
-  async getTaskGraphValues(user: any): Promise<SeriesObject[]> {
-    const { twoDaysAgo, afterTwoDays } = prevAndFutureDates();
-    const tasks = await this.prisma.task.findMany({
-      where: {
-        userId: user.id,
-        date: {
-          gte: twoDaysAgo,
-          lte: afterTwoDays,
-        },
-      },
-      orderBy: {
-        date: 'asc',
-      },
-    });
 
+  async getTaskGraphValues(user: Partial<User>): Promise<SeriesObject[]> {
+    const { twoDaysAgo, afterTwoDays } = prevAndFutureDates();
     const result: SeriesObject[] = await this.prisma
       .$queryRaw`SELECT DATE_TRUNC ('day', date) AS day, COUNT(id) AS number_of_tasks FROM tasks 
       WHERE "userId" =${user.id} AND (date BETWEEN ${twoDaysAgo} AND ${afterTwoDays}) GROUP BY DATE_TRUNC('day', date);`;

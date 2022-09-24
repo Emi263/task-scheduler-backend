@@ -16,7 +16,6 @@ async function bootstrap() {
     .setTitle('Task Scheduler')
     .setDescription('The task scheduler project api documentation')
     .setVersion('1.0')
-    .addTag('task')
     .addBearerAuth(
       {
         name: 'Authorization',
