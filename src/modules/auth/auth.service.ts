@@ -1,3 +1,4 @@
+/* eslint-disable no-useless-catch */
 import {
   BadRequestException,
   ConflictException,
@@ -33,7 +34,7 @@ export class AuthService {
     private jwt: JwtService,
     private config: ConfigService,
     private mail: MailService,
-  ) {}
+  ) { }
 
   async login(userDto: AuthLoginDto) {
     const user = await this.prismaService.user.findUnique({
@@ -215,6 +216,7 @@ export class AuthService {
 
     const hashedPassword = await bycrypt.hash(randomPass, 10);
 
+    // eslint-disable-next-line no-useless-catch
     try {
       await this.mail.sendEmail(email, randomPass);
     } catch (e) {

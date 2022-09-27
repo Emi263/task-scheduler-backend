@@ -8,22 +8,22 @@ export class MailService {
       host: 'smtp.ethereal.email',
       port: 587,
       auth: {
-        user: 'norbert.conn2@ethereal.email',
-        pass: 'hxJ6bWQn397jQPPay1',
+        user: 'earnestine15@ethereal.email',
+        pass: 'DVPPZGDARAxsh3M8yc',
       },
     });
 
     const details = {
-      from: 'norbert.conn2@ethereal.email',
+      from: 'earnestine15@ethereal.email',
       to: `${email}`,
-      subject: 'test',
-      text: '<h2>Test </h2>',
+      subject: 'Password Reset',
+      text: '<h2>Here is your password reset </h2>',
       html: `<b>Hello</b> <br> <p>Your one-time password is: ${randomPass}! You chould change the password into your account`,
     };
 
     mailTransporter.sendMail(details, (e, s) => {
       console.log(e);
       console.log(s);
-    });
+    })
   }
 }
